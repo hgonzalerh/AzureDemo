@@ -1,0 +1,52 @@
+- name: Linux infra is created
+  hosts: linux
+  gather_facts: false
+  # Make sure auth for Azure is included from the environment
+  vars_files:
+    - demo_vars.yml
+  vars:
+    # Used for setting username and password already defined in connection vars
+    demo_admin_username: "ansible"
+    demo_admin_password: "ansib+3RedHat"
+
+  tasks:
+    - delegate_to: localhost
+      block:
+      - name: Virtual Network {{ demo_vnet_name }} is created
+        azure.azcollection.azure_rm_virtualnetwork:
+          resource_group: "{{ demo_resource_group }}"
+          name: "{{ demo_vnet_name }}"
+          address_prefixes_cidr:
+            - 10.1.0.0/24
+          state: present
+        run_once: true
+
+      - name: Subnet is created on {{ demo_vnet_name }}
+        azure.azcollection.azure_rm_subnet:
+          name: "{{ demo_vnet_name }}_sub"
+          resource_group: "{{ demo_resource_group }}"
+          virtual_network_name: "{{ demo_vnet_name }}"
+          address_prefix_cidr: "10.1.0.0/24"
+        run_once: true
+
+      - name: Create linux vms
+        azure.azcollection.azure_rm_virtualmachine:
+          name: "{{ inventory_hostname }}"
+          resource_group: "{{ demo_resource_group }}"
+          location: "{{ demo_location }}"
+          virtual_network_name: "{{ demo_vnet_name }}"
+          open_ports:
+            - '22'
+          vm_size: "{{ demo_vm_size }}"
+          admin_username: "{{ demo_admin_username }}"
+          admin_password: "{{ demo_admin_password }}"
+          managed_disk_type: "{{ demo_managed_disk_type }}"
+          image: "{{ demo_image }}"
+          plan: "{{ demo_plan }}"
+          # os_type: Linux
+          tags:
+            demo_role: "{{ 'database' if 'database' in group_names else 'web'}}"
+            cost-center: "542"  # Reuse or modify
+          allocated: true
+          started: true
+          state: present
