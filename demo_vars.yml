@@ -1,5 +1,5 @@
 demo_vnet_name: ansible-lin-patching-vnet
-demo_resource_group: "{{ lookup('env','RESOURCEGROUP') | default(true, resourcegroup) }}"
+demo_resource_group: "{{ lookup('env','RESOURCEGROUP') default(resourcegroup, true) }}"
 demo_location: "eastus"
 demo_vm_size: "Standard_D2s_v3"
 demo_managed_disk_type: "StandardSSD_LRS"
