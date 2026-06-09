@@ -4,9 +4,3 @@ vm2
 
 [database]
 vm2
-
-[linux:vars]
-;name of Azure VM model
-ansible_password="RedHatAnsible4$" 
-ansible_user=AntioquaSuper 
-ansible_shell_type=cmd
