@@ -1,6 +1,7 @@
 [linux]
 vm1 
 vm2
+vm3
 
 [database]
 vm2
